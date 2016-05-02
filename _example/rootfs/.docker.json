@@ -1,7 +1,10 @@
 {
-  "repo_tags": ["mrhenry/test:latest"],
+  "repo_tags": ["gcr.io/hypnotic-surge-101511/test"],
   "author":"Simon Menke <simon.menke@gmail.com>",
   "config": {
+    "Volumes": {
+      "/data":{}
+    },
     "Entrypoint": ["/bin/hello"]
   }
 }

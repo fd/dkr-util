@@ -63,11 +63,12 @@ type ContainerConfig struct {
 	Env          []string
 	Entrypoint   []string
 	Cmd          []string
-	Volumes      []string
+	Volumes      map[string]struct{}
 	WorkingDir   string
 }
 
 type imageConfig struct {
+	ID           string           `json:"id"`
 	Created      time.Time        `json:"created"`
 	Author       string           `json:"author"`
 	Architecture string           `json:"architecture"`
@@ -228,6 +229,10 @@ func mkImageConfig(conf *Config) ([]byte, error) {
 		iconf.Architecture = "amd64"
 	}
 
+	imageIDSum := sha256.Sum256([]byte(conf.diffID + conf.imageTime.String()))
+	imageIDHex := hex.EncodeToString(imageIDSum[:])
+	iconf.ID = imageIDHex
+
 	data, err := json.Marshal(&iconf)
 	if err != nil {
 		return nil, err
@@ -247,6 +252,13 @@ func mkManifest(conf *Config) ([]byte, error) {
 			RepoTags: conf.RepoTags,
 			Layers:   []string{conf.diffID + "/layer.tar"},
 		},
+	}
+
+	for i, e := range manifest {
+		for j, tag := range e.RepoTags {
+			e.RepoTags[j] = joinRepoTag(splitRepoTag(tag))
+		}
+		manifest[i] = e
 	}
 
 	return json.Marshal(&manifest)
@@ -335,4 +347,55 @@ func mkImageArchive(conf *Config, manifest, imageConf, layerTar []byte) ([]byte,
 	}
 
 	return tarBuf.Bytes(), nil
+}
+
+func splitRepoTag(t string) (registry, repo, tag string) {
+
+	parts := strings.SplitN(t, "/", 3)
+	if len(parts) == 1 {
+		parts = []string{
+			"docker.io",
+			"library/",
+			parts[0],
+		}
+	}
+	if len(parts) == 2 {
+		parts = []string{
+			"docker.io",
+			parts[0],
+			parts[1],
+		}
+	}
+
+	tagParts := strings.SplitN(parts[2], ":", 2)
+	if len(tagParts) == 1 {
+		parts = []string{
+			parts[0],
+			parts[1],
+			tagParts[0],
+			"latest",
+		}
+	}
+	if len(tagParts) == 2 {
+		parts = []string{
+			parts[0],
+			parts[1],
+			tagParts[0],
+			tagParts[1],
+		}
+	}
+
+	registry = parts[0]
+	repo = strings.Join(parts[1:3], "/")
+	tag = parts[3]
+	return
+}
+
+func joinRepoTag(reg, repo, tag string) string {
+	repo = strings.TrimPrefix(repo, "library/")
+	fullTag := repo + ":" + tag
+	if reg != "docker.io" {
+		fullTag = reg + "/" + fullTag
+	}
+	return fullTag
 }
