@@ -1,0 +1,7 @@
+{
+  "repo_tags": ["mrhenry/test:latest"],
+  "author":"Simon Menke <simon.menke@gmail.com>",
+  "config": {
+    "Entrypoint": ["/bin/hello"]
+  }
+}
