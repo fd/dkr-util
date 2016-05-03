@@ -1,0 +1,24 @@
+box: golang
+
+build:
+  steps:
+  - setup-go-workspace
+
+  - script:
+      name: "go install"
+      code: |
+        CGO_ENABLED=0 go install -v ./cmd/...
+
+  - script:
+      name: "go test"
+      code: |
+        go test -v ./cmd/... ./pkg/...
+
+  - script:
+      name: "go build"
+      code: |
+        mkdir -p ${WERCKER_OUTPUT_DIR}/dist
+        CGO_ENABLED=0 GOOS=linux  GOARCH=amd64 go build -o ${WERCKER_OUTPUT_DIR}/bin/dkr-linux-amd64/dkr  -v ./cmd/dkr
+        CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -o ${WERCKER_OUTPUT_DIR}/bin/dkr-darwin-amd64/dkr -v ./cmd/dkr
+        tar -C ${WERCKER_OUTPUT_DIR}/bin/dkr-linux-amd64  -f ${WERCKER_OUTPUT_DIR}/dist/dkr-linux-amd64.tar.gz  -cz .
+        tar -C ${WERCKER_OUTPUT_DIR}/bin/dkr-darwin-amd64 -f ${WERCKER_OUTPUT_DIR}/dist/dkr-darwin-amd64.tar.gz -cz .
