@@ -10,8 +10,8 @@ import (
 	"github.com/fd/dkr-util/pkg/cat"
 	"github.com/fd/dkr-util/pkg/package"
 	"github.com/fd/dkr-util/pkg/push"
-
 	"gopkg.in/alecthomas/kingpin.v2"
+	"limbo.services/version"
 )
 
 func main() {
@@ -28,7 +28,7 @@ func run() error {
 		outputTar string
 	)
 
-	app := kingpin.New("dkr", "Docker utilities")
+	app := kingpin.New("dkr", "Docker utilities").Version(version.Get().String()).Author(version.Get().ReleasedBy)
 
 	packageCmd := app.Command("package", "Make a new image without running docker")
 	packageCmd.Flag("input", "Tar archive to use").Short('i').Default("-").PlaceHolder("FILE").StringVar(&inputTar)
