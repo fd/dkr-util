@@ -43,8 +43,8 @@ deploy:
       code: |
         if [[ "$WERCKER_DEPLOYTARGET_NAME" == "prerelease" ]]; then
           TAG="$(echo "$WERCKER_GIT_COMMIT" | cut -c 1-7)"
-          ghr -u fd -r dkr-util -c $WERCKER_GIT_COMMIT --replace --prerelease "v1.0.0-pre+x${TAG}" ./dist
+          ghr -u fd -r dkr-util -c $WERCKER_GIT_COMMIT --replace --prerelease "v1.0.0-pre+c.${TAG}" ./dist
         else
           TAG="$(echo "$WERCKER_GIT_COMMIT" | cut -c 1-7)"
-          ghr -u fd -r dkr-util -c $WERCKER_GIT_COMMIT --replace "v1.0.0+x${TAG}" ./dist
+          ghr -u fd -r dkr-util -c $WERCKER_GIT_COMMIT --replace "v1.0.0+c.${TAG}" ./dist
         fi
