@@ -49,5 +49,5 @@ deploy:
         steps:
   - mbrevda/wercker-triggerbuild@0.0.10:
       token: $WRK_TOKEN
-      applicaiton_id: $WRK_APP
+      application_id: $WRK_APP
       message: Triggered from dkr
