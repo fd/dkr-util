@@ -33,14 +33,14 @@ deploy:
           v5n apply --commit $WERCKER_GIT_COMMIT --author "Simon Menke" bin/dkr-darwin-amd64/dkr "$VERSION"
           tar -C bin/dkr-linux-amd64  -f dist/dkr-linux-amd64.tar.gz  -cz .
           tar -C bin/dkr-darwin-amd64 -f dist/dkr-darwin-amd64.tar.gz -cz .
-          ghr -u fd -r dkr-utils -c $WERCKER_GIT_COMMIT --replace --prerelease "v$VERSION" ./dist
+          ghr -u fd -r dkr-util -c $WERCKER_GIT_COMMIT --replace --prerelease "v$VERSION" ./dist
         else
           VERSION="$(v5n store bump dkr final+patch)"
           v5n apply --commit $WERCKER_GIT_COMMIT --author "Simon Menke" bin/dkr-linux-amd64/dkr  "$VERSION"
           v5n apply --commit $WERCKER_GIT_COMMIT --author "Simon Menke" bin/dkr-darwin-amd64/dkr "$VERSION"
           tar -C bin/dkr-linux-amd64  -f dist/dkr-linux-amd64.tar.gz  -cz .
           tar -C bin/dkr-darwin-amd64 -f dist/dkr-darwin-amd64.tar.gz -cz .
-          ghr -u fd -r dkr-utils -c $WERCKER_GIT_COMMIT --replace "v$VERSION" ./dist
+          ghr -u fd -r dkr-util -c $WERCKER_GIT_COMMIT --replace "v$VERSION" ./dist
         fi
   - mbrevda/wercker-triggerbuild@0.0.10:
       token: $WRK_TOKEN
