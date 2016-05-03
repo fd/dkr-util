@@ -18,7 +18,20 @@ build:
       name: "go build"
       code: |
         mkdir -p ${WERCKER_OUTPUT_DIR}/dist
-        CGO_ENABLED=0 GOOS=linux  GOARCH=amd64 go build -o ${WERCKER_OUTPUT_DIR}/bin/dkr-linux-amd64/dkr  -v ./cmd/dkr
-        CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -o ${WERCKER_OUTPUT_DIR}/bin/dkr-darwin-amd64/dkr -v ./cmd/dkr
+        CGO_ENABLED=0 GOOS=linux  GOARCH=amd64 go build -o ${WERCKER_OUTPUT_DIR}/bin/dkr-linux-amd64/dkr  ./cmd/dkr
+        CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -o ${WERCKER_OUTPUT_DIR}/bin/dkr-darwin-amd64/dkr ./cmd/dkr
         tar -C ${WERCKER_OUTPUT_DIR}/bin/dkr-linux-amd64  -f ${WERCKER_OUTPUT_DIR}/dist/dkr-linux-amd64.tar.gz  -cz .
         tar -C ${WERCKER_OUTPUT_DIR}/bin/dkr-darwin-amd64 -f ${WERCKER_OUTPUT_DIR}/dist/dkr-darwin-amd64.tar.gz -cz .
+
+deploy:
+  steps:
+  - script:
+      name: "Get ghr"
+      code: |
+        curl -O -L https://github.com/tcnksm/ghr/releases/download/v0.4.0/ghr_v0.4.0_linux_amd64.zip
+        unzip -p ghr_v0.4.0_darwin_amd64.zip ghr > /usr/local/bin/ghr
+        chmod a+x /usr/local/bin/ghr
+  - script:
+      name: "Push release"
+      code: |
+        ghr -u fd -r dkr-util -c $WERCKER_GIT_COMMIT --replace --prerelease v1.0.0-b1 ./dist
