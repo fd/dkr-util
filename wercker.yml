@@ -36,7 +36,7 @@ deploy:
       name: "Get ghr"
       code: |
         curl -O -L https://github.com/tcnksm/ghr/releases/download/v0.4.0/ghr_v0.4.0_linux_amd64.zip
-        unzip -p ghr_v0.4.0_darwin_amd64.zip ghr > /usr/local/bin/ghr
+        unzip -p ghr_v0.4.0_linux_amd64.zip ghr > /usr/local/bin/ghr
         chmod a+x /usr/local/bin/ghr
   - script:
       name: "Push release"
