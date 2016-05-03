@@ -1,6 +1,7 @@
-box: golang
+
 
 build:
+  box: golang
   steps:
   - setup-go-workspace
 
@@ -24,7 +25,13 @@ build:
         tar -C ${WERCKER_OUTPUT_DIR}/bin/dkr-darwin-amd64 -f ${WERCKER_OUTPUT_DIR}/dist/dkr-darwin-amd64.tar.gz -cz .
 
 deploy:
+  box: golang
   steps:
+  - script:
+      name: "Get unzip"
+      code: |
+        apt-get update -y
+        apt-get install -y unzip
   - script:
       name: "Get ghr"
       code: |
