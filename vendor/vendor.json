@@ -287,6 +287,12 @@
 			"path": "gopkg.in/alecthomas/kingpin.v2",
 			"revision": "8cccfa8eb2e3183254457fb1749b2667fbc364c7",
 			"revisionTime": "2016-02-17T09:03:01Z"
+		},
+		{
+			"checksumSHA1": "KCKGhkG0EDb0Nla/4JqLESZuv4I=",
+			"path": "limbo.services/version",
+			"revision": "f1c2988d5d7e84da906db00e14f6794c6860603c",
+			"revisionTime": "2016-05-03T17:52:44Z"
 		}
 	],
 	"rootPath": "github.com/fd/dkr-util"
