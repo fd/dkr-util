@@ -46,7 +46,6 @@ deploy:
           TAG="$(echo "$WERCKER_GIT_COMMIT" | cut -c 1-7)"
           ghr -u fd -r dkr-util -c $WERCKER_GIT_COMMIT --replace "v1.0.0+c.${TAG}" ./dist
         fi
-        steps:
   - mbrevda/wercker-triggerbuild@0.0.10:
       token: $WRK_TOKEN
       application_id: $WRK_APP
