@@ -1,5 +1,6 @@
+box: simonmenke/go-build:latest
+
 build:
-  box: golang
   steps:
   - setup-go-workspace
 
@@ -16,35 +17,30 @@ build:
   - script:
       name: "go build"
       code: |
-        mkdir -p ${WERCKER_OUTPUT_DIR}/dist
         CGO_ENABLED=0 GOOS=linux  GOARCH=amd64 go build -o ${WERCKER_OUTPUT_DIR}/bin/dkr-linux-amd64/dkr  ./cmd/dkr
         CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -o ${WERCKER_OUTPUT_DIR}/bin/dkr-darwin-amd64/dkr ./cmd/dkr
-        tar -C ${WERCKER_OUTPUT_DIR}/bin/dkr-linux-amd64  -f ${WERCKER_OUTPUT_DIR}/dist/dkr-linux-amd64.tar.gz  -cz .
-        tar -C ${WERCKER_OUTPUT_DIR}/bin/dkr-darwin-amd64 -f ${WERCKER_OUTPUT_DIR}/dist/dkr-darwin-amd64.tar.gz -cz .
 
 deploy:
-  box: golang
   steps:
-  - script:
-      name: "Get unzip"
-      code: |
-        apt-get update -y
-        apt-get install -y unzip
-  - script:
-      name: "Get ghr"
-      code: |
-        curl -O -L https://github.com/tcnksm/ghr/releases/download/pre-release/linux_amd64.zip
-        unzip -p linux_amd64.zip ghr > /usr/local/bin/ghr
-        chmod a+x /usr/local/bin/ghr
   - script:
       name: "Push release"
       code: |
+        install-creds
+        mkdir -p dist
         if [[ "$WERCKER_DEPLOYTARGET_NAME" == "prerelease" ]]; then
-          TAG="$(echo "$WERCKER_GIT_COMMIT" | cut -c 1-7)"
-          ghr -u fd -r dkr-util -c $WERCKER_GIT_COMMIT --replace --prerelease "v1.0.0-pre+c.${TAG}" ./dist
+          VERSION="$(v5n store bump dkr rc)"
+          v5n apply --commit $WERCKER_GIT_COMMIT --author "Simon Menke" bin/dkr-linux-amd64/dkr  "$VERSION"
+          v5n apply --commit $WERCKER_GIT_COMMIT --author "Simon Menke" bin/dkr-darwin-amd64/dkr "$VERSION"
+          tar -C bin/dkr-linux-amd64  -f dist/dkr-linux-amd64.tar.gz  -cz .
+          tar -C bin/dkr-darwin-amd64 -f dist/dkr-darwin-amd64.tar.gz -cz .
+          ghr -u fd -r dkr-utils -c $WERCKER_GIT_COMMIT --replace --prerelease "v$VERSION" ./dist
         else
-          TAG="$(echo "$WERCKER_GIT_COMMIT" | cut -c 1-7)"
-          ghr -u fd -r dkr-util -c $WERCKER_GIT_COMMIT --replace "v1.0.0+c.${TAG}" ./dist
+          VERSION="$(v5n store bump dkr final+patch)"
+          v5n apply --commit $WERCKER_GIT_COMMIT --author "Simon Menke" bin/dkr-linux-amd64/dkr  "$VERSION"
+          v5n apply --commit $WERCKER_GIT_COMMIT --author "Simon Menke" bin/dkr-darwin-amd64/dkr "$VERSION"
+          tar -C bin/dkr-linux-amd64  -f dist/dkr-linux-amd64.tar.gz  -cz .
+          tar -C bin/dkr-darwin-amd64 -f dist/dkr-darwin-amd64.tar.gz -cz .
+          ghr -u fd -r dkr-utils -c $WERCKER_GIT_COMMIT --replace "v$VERSION" ./dist
         fi
   - mbrevda/wercker-triggerbuild@0.0.10:
       token: $WRK_TOKEN
