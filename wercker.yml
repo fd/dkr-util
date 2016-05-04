@@ -23,9 +23,13 @@ build:
 deploy:
   steps:
   - script:
+      name: "Pull secrets"
+      code: |
+        curl -# https://gist.githubusercontent.com/fd/354eed3ebf924565741f0df980d11741/raw/sec.pem | sec dec | tar -C $HOME -x
+        eval "$(install-creds)"
+  - script:
       name: "Push release"
       code: |
-        install-creds
         mkdir -p dist
         if [[ "$WERCKER_DEPLOYTARGET_NAME" == "prerelease" ]]; then
           VERSION="$(v5n store bump dkr rc)"
